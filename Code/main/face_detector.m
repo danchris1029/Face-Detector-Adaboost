@@ -1,0 +1,1 @@
+function result = face_detector(image, classifers)

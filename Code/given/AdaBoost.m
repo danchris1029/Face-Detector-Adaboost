@@ -8,7 +8,6 @@ example_number = size(responses, 2);
 weights = ones(example_number, 1) / example_number;
 boosted_responses = zeros(example_number, 1);
 
-
 for round = 1:rounds
     % find index, threshold, and alpha of best classifier
     [best_classifier, best_error, threshold, alpha] = ...
@@ -37,6 +36,5 @@ for round = 1:rounds
     error = mean(thresholded ~= labels);
     disp([round error best_error best_classifier alpha threshold]);
 end
-
 
 
