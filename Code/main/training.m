@@ -51,8 +51,8 @@ end
 % sum the responses from each image for each classifier together into one
 % row within responses
 
-labels = [1, 1, 1];
-boosted_classifier = AdaBoost(responses, labels, 1);
+labels = [1, -1, 1];
+boosted_classifier = AdaBoost(responses, labels', 15);
 
 
 

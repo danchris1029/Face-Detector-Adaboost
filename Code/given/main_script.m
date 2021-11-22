@@ -5,12 +5,14 @@
 % the paths to reflect the locations where you have stored the code 
 % and data in your computer.
 
+% metsis
+
 restoredefaultpath;
 clear all;
 close all;
 
 % Replace this path with your cs4379c-fall2021 git repository path in your system.
-repo_path = 'C:\Users\vangelis\Files\Academia\Teaching\TxState\CS4379C-Fall2021\Git\cs4379c-fall2021';
+repo_path = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\cs4379c-fall2021';
 
 s = filesep; % This gets the file separator character from the  system
 
