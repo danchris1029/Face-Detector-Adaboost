@@ -2,8 +2,20 @@
 
 % we don't find the best rectangle filter, but the best classifer when
 % boosting
+
+training_faces = strcat(training_directory, '\training_faces');
+training_nonfaces = strcat(training_directory, '\training_nonfaces');
+other_code = strcat(code_directory, '\given');
+addpath([other_code s '00_common' s '00_detection'])
+addpath([other_code s '00_common' s '00_images'])
+addpath([other_code s '00_common' s '00_utilities'])
+addpath(other_code)
+addpath(training_faces)
+addpath(training_nonfaces)
+
+cd(code_directory)
 number_faces = 100;
-number_nonfaces = 50;
+number_nonfaces = 2;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
@@ -27,7 +39,7 @@ for i = 1:number_nonfaces
     end
   end
 end
-imshow(nonfaces(:,:,5),[]);
+%imshow(nonfaces(:,:,5),[]);
 dimensions = [size(faces(:,:,1),1), size(faces(:,:,1),2)];%[100, 100];
 % traing_face dimension is 100 x 100
 
@@ -90,7 +102,6 @@ boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
 %    kept_classifiers{i} = weak_classifiers{boosted_classifier(i,1)};
 %end
 
-cd([main_path])
 save boosted_classifier boosted_classifier
 save weak_classifiers weak_classifiers
 save boosted_classifier_num boosted_classifier_num

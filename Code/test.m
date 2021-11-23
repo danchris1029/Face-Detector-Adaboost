@@ -1,4 +1,17 @@
-cd([main_path])
+cd(code_directory)
+
+s = filesep; % This gets the file separator character from the  system
+test_faces_photos = strcat(training_directory, '\test_face_photos');
+test_cropped_faces = strcat(training_directory, '\test_cropped_faces');
+test_nonfaces = strcat(training_directory, '\test_nonfaces');
+other_code = strcat(code_directory, '\given');
+addpath([other_code s '00_common' s '00_detection'])
+addpath([other_code s '00_common' s '00_images'])
+addpath([other_code s '00_common' s '00_utilities'])
+addpath(other_code)
+addpath(test_faces_photos)
+addpath(test_cropped_faces)
+addpath(test_nonfaces)
 
 load boosted_classifier
 load weak_classifiers
@@ -13,9 +26,8 @@ for i = 1:size(face_images_cropped,3)
 end
 %}
 
-cd([test_faces_photos])
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
-cd([repo_path])
+%cd([repo_path])
 for i = 1:size(face_images_photo,3)
     filename = fullfile(test_faces_photos,face_images_photo(i).name);
     photo_image = read_gray(filename);
