@@ -22,4 +22,4 @@ addpath([repo_path s '00_common' s '00_images'])
 addpath([repo_path s '00_common' s '00_utilities'])
 cd([repo_path])
 
-training
+train

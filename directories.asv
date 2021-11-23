@@ -3,7 +3,7 @@
 %code_directory = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\FinalProject\ComputerVisionProj\Code'
 %training_directory = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\FinalProject\ComputerVisionProj\Data'
 %Connor
-data_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Data';
-code_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Code';
-training_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Data';
+data_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj';
+code_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj';
+training_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj';
 

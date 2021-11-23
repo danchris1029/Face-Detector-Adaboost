@@ -14,8 +14,8 @@ addpath(training_faces)
 addpath(training_nonfaces)
 
 cd(code_directory)
-number_faces = 100;
-number_nonfaces = 2;
+number_faces = 300;
+number_nonfaces = 50;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
@@ -29,15 +29,9 @@ end
 
 nonfaces = zeros(100, 100, number_nonfaces);
 for i = 1:number_nonfaces
-  filename = fullfile(training_nonfaces,nonface_images(i).name);
-  temp_nonface = read_gray(filename);
-  for j = 1:(size(temp_nonface,1)-100)
-    for k = 1:(size(temp_nonface,2)-100)
-        %if(k == j)
-            nonfaces(:,:,k) = temp_nonface(j:j+99,k:k+99);
-        %end
-    end
-  end
+    filename = fullfile(training_nonfaces,nonface_images(i).name);
+    temp_nonface = read_gray(filename);
+    nonfaces(:,:,i) = imresize(temp_nonface,[100,100]);
 end
 %imshow(nonfaces(:,:,5),[]);
 dimensions = [size(faces(:,:,1),1), size(faces(:,:,1),2)];%[100, 100];
