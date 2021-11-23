@@ -1,4 +1,5 @@
 # ComputerVisionProj
 
 1. Run directories.m
-2. Run train.m or test.m in project-path\code
+2. Run train.m or test.m in 
+ComputerVisionProj\code
