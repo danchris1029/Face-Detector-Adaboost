@@ -12,7 +12,7 @@ clear all;
 close all;
 
 % Replace this path with your cs4379c-fall2021 git repository path in your system.
-repo_path = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\cs4379c-fall2021';
+repo_path = 'C:\Users\Connor\Documents\School\ComputerVision\cs4379c-fall2021';
 
 s = filesep; % This gets the file separator character from the  system
 

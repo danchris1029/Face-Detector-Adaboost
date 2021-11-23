@@ -3,9 +3,16 @@ clear all;
 close all;
 
 % Change path to your own local path
-repo_path = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\FinalProject\ComputerVisionProj\Code\given';
-training_faces = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\FinalProject\ComputerVisionProj\Data\training_faces'
-main_path = 'C:\Users\Hawkk\OneDrive\college\CurrentClasses\computervision\FinalProject\ComputerVisionProj\Code\main'
+%Connor
+project_path = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj';
+repo_path = strcat(project_path,'\Code\given');
+training_faces = strcat(project_path, '\Data\training_faces');
+training_nonfaces = strcat(project_path, '\Data\training_nonfaces');
+test_faces_photos = strcat(project_path, '\Data\test_face_photos');
+test_cropped_faces = strcat(project_path, '\Data\test_cropped_faces');
+test_nonfaces = strcat(project_path, '\Data\test_nonfaces');
+
+main_path = strcat(project_path, '\Code\main');
 
 s = filesep; % This gets the file separator character from the  system
 
