@@ -15,32 +15,39 @@ addpath(training_nonfaces)
 
 cd(code_directory)
 number_faces = 300;
-number_nonfaces = 50;
+number_nonfaces = 130;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
 
 %nfiles = length(imagefiles);
-faces = zeros(100, 100, number_faces);
+faces = zeros(63, 57, number_faces);
 for i = 1:number_faces
   filename = fullfile(training_faces,face_images(i).name);
-  faces(:,:,i)=read_gray(filename);
+  tempface = read_gray(filename);
+  faces(:,:,i) = tempface(19:81, 22:78);
 end
-
-nonfaces = zeros(100, 100, number_nonfaces);
+%imshow(tempface(19:81, 22:78),[]);
+nonfaces = zeros(size(faces,1), size(faces,2), number_nonfaces);
+num_subwindows = 5;
+non_faces_index = 1;
 for i = 1:number_nonfaces
     filename = fullfile(training_nonfaces,nonface_images(i).name);
     temp_nonface = read_gray(filename);
-    nonfaces(:,:,i) = imresize(temp_nonface,[100,100]);
+    for j = 1:num_subwindows
+        offset_x = floor((size(temp_nonface,1)-3*size(nonfaces,1)).*rand(1,1)+size(nonfaces,1));
+        offset_y = floor((size(temp_nonface,2)-3*size(nonfaces,2)).*rand(1,1)+size(nonfaces,2));
+        nonfaces(:,:,non_faces_index) = temp_nonface(19+offset_x:81+offset_x, 22+offset_y:78+offset_y);
+        non_faces_index = non_faces_index+1;
+    end
 end
-%imshow(nonfaces(:,:,5),[]);
 dimensions = [size(faces(:,:,1),1), size(faces(:,:,1),2)];%[100, 100];
 % traing_face dimension is 100 x 100
 
 % We have 5 thresholds per pixel
 % so 10000 * 5 = 50000 classifers
 
-number = (dimensions(1) * dimensions(2))/10;
+number = (dimensions(1) * dimensions(2));
 weak_classifiers = cell(1, number);
 for i = 1:number
     weak_classifiers{i} = generate_classifier(dimensions(1), dimensions(2));
@@ -55,11 +62,11 @@ examples = zeros(face_vertical, face_horizontal, example_number);
 examples (:, :, 1:size(faces, 3)) = face_integrals;
 examples(:, :, (size(faces, 3)+1):example_number) = nonface_integrals;
 %}
-face_integrals = zeros(100, 100, number_faces);
+face_integrals = zeros(size(faces,1), size(faces,2), number_faces);
 for i = 1:size(faces, 3)
     face_integrals(:,:,i) = integral_image(faces(:, :, i));
 end
-nonface_integrals = zeros(100, 100, number_nonfaces);
+nonface_integrals = zeros(size(faces,1), size(faces,2), number_nonfaces);
 for i = 1:size(nonfaces, 3)
     nonface_integrals(:,:,i) = integral_image(nonfaces(:, :, i));
 end
@@ -88,7 +95,7 @@ end
 
 % sum the responses from each image for each classifier together into one
 % row within responses
-boosted_classifier_num = 15;
+boosted_classifier_num = 25;
 boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
 
 %kept_classifiers = cell(1, boosted_classifier_num);
@@ -111,7 +118,7 @@ end
 for i = 1:size(nonfaces,3)
     prediction = boosted_predict(nonfaces(:, :, i), boosted_classifier, weak_classifiers, boosted_classifier_num);
     if (prediction > 0)
-     num_wrong_nonface = num_wrong_nonface + 1;
+        num_wrong_nonface = num_wrong_nonface + 1;
     end
 end
 

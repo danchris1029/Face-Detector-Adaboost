@@ -19,15 +19,15 @@ load weak_classifiers
 load boosted_classifier_num
 %%
 
-%cd([test_cropped_faces])
+%read in the cropped faces (size 100 x 100)
 face_images_cropped = dir(fullfile(test_cropped_faces,'*.bmp'));
 cropped_faces = zeros(100, 100, number_faces);
 for i = 1:size(face_images_cropped,3)
   filename = fullfile(test_cropped_faces,face_images_cropped(i).name);
   cropped_faces(:,:,i) = read_gray(filename);
 end
-
-
+%%
+%Read in the faces, diff sizes
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
 %cd([repo_path])
 for i = 1:size(face_images_photo,3)
@@ -35,9 +35,10 @@ for i = 1:size(face_images_photo,3)
     photo_image = read_gray(filename);
     imshow(photo_image, []);
 
-    [result, boxes] = boosted_detector_demo(photo_image, 1:0.5:3, boosted_classifier, weak_classifiers, [31, 25], 1);
+    [result, boxes] = boosted_detector_demo(photo_image, 1, boosted_classifier, weak_classifiers, [68,57], 5);
     imshow(result, []);
 end
+%%
 %{
 num_wrong_face = 0;
 num_wrong_nonface = 0;
