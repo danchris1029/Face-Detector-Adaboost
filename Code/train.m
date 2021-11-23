@@ -99,7 +99,7 @@ boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
 save boosted_classifier boosted_classifier
 save weak_classifiers weak_classifiers
 save boosted_classifier_num boosted_classifier_num
-%{
+
 num_wrong_face = 0;
 num_wrong_nonface = 0;
 for i = 1:size(faces,3)
@@ -114,7 +114,7 @@ for i = 1:size(nonfaces,3)
      num_wrong_nonface = num_wrong_nonface + 1;
     end
 end
-%}
+
 % Each time we create a weak classifer, we use generate_classifer
 
 % Every weak classifer has soft classifer per threshold

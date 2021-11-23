@@ -19,7 +19,7 @@ load weak_classifiers
 load boosted_classifier_num
 %%
 
-%cd([test_cropped_faces])
+cd([test_cropped_faces])
 face_images_cropped = dir(fullfile(test_cropped_faces,'*.bmp'));
 cropped_faces = zeros(100, 100, number_faces);
 for i = 1:size(face_images_cropped,3)
