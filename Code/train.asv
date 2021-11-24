@@ -149,18 +149,7 @@ for round = 1: rounds
         end
     end
     
-    
     % We need a non_face pool for false negatives
-    %{
-    num_wrong_nonface = 0;
-
-    for i = 1:size(nonfaces,3)
-        prediction = boosted_predict(nonfaces(:, :, i), boosted_classifier, weak_classifiers, boosted_classifier_num);
-        if (prediction > 0)
-            num_wrong_nonface = num_wrong_nonface + 1;
-        end
-    end
-    %}
 
     if(num_wrong_face == 0)
         break;

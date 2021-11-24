@@ -30,14 +30,16 @@ end
 %Read in the faces, diff sizes
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
 %cd([repo_path])
-for i = 1:size(face_images_photo,3)
-    filename = fullfile(test_faces_photos,face_images_photo(i).name);
+%for i = 1:size(face_images_photo, 1)
+    filename = fullfile(test_faces_photos,face_images_photo(8).name);
     photo_image = read_gray(filename);
     imshow(photo_image, []);
 
-    [result, boxes] = boosted_detector_demo(photo_image, 1, boosted_classifier, weak_classifiers, [68,57], 5);
+    [result, boxes] = boosted_detector_demo(photo_image, 0.4:0.2:3, boosted_classifier, weak_classifiers, [68,57], 1);
+    
+    figure(i);
     imshow(result, []);
-end
+%end
 %%
 %{
 num_wrong_face = 0;
