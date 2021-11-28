@@ -27,19 +27,32 @@ for i = 1:size(face_images_cropped,3)
   cropped_faces(:,:,i) = read_gray(filename);
 end
 %%
-%Read in the faces, diff sizes
+%Get an image and detect skin on it, return the matrix that's been
+%thresholded
+
+positive_histogram = 
+negative_histogram = 
+
+for i = 1:size(face_images_photo, 1)
+    filename = fullfile(test_faces_photos,face_images_photo(2).name);
+    color_photo_image = read_gray(filename);
+    
+
+end
+
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
 %cd([repo_path])
-%for i = 1:size(face_images_photo, 1)
-    filename = fullfile(test_faces_photos,face_images_photo(8).name);
-    photo_image = read_gray(filename);
-    imshow(photo_image, []);
+for i = 1:size(face_images_photo, 1)
 
-    [result, boxes] = boosted_detector_demo(photo_image, 0.4:0.2:3, boosted_classifier, weak_classifiers, [68,57], 1);
+    filename = fullfile(test_faces_photos,face_images_photo(2).name);
+    photo_image = read_gray(filename);
+    %imshow(photo_image, []);
+
+    [result, boxes] = boosted_detector_demo(photo_image, .4:0.2:3, boosted_classifier, weak_classifiers, [68,57], 5);
     
-    figure(i);
+    figure
     imshow(result, []);
-%end
+end
 %%
 %{
 num_wrong_face = 0;
