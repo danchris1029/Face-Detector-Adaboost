@@ -22,6 +22,7 @@ for weak_classifier = 1:classifier_number
     classifier_threshold = boosted(weak_classifier, 3);
     classifier = weak_classifiers{classifier_index};
     
+    % get response for pixel
     for vertical = 1:(vertical_size-face_vertical+1)
         for horizontal = 1:(horizontal_size-face_horizontal+1)
             

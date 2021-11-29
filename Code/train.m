@@ -21,8 +21,8 @@ best_boosted_classifer = zeros(0, 3);
 
 %%
 
-number_faces = 50;
-number_nonfaces = 20;
+number_faces = 10;
+number_nonfaces = 2;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
@@ -35,7 +35,7 @@ for i = 1:number_faces
   faces(:,:,i) = tempface(26:88, 22:78);
 end
 
-face_pool = zeros(63, 57, number_faces);
+face_pool = zeros(63, 57, size(face_images, 1));
 for i = 1:size(face_images, 1)
   filename = fullfile(training_faces,face_images(i).name);
   tempface = read_gray(filename);
@@ -103,7 +103,7 @@ n = [0];
 i = 1;
 
 % the maximum acceptable false positive rate per layer.
-f = 0.2;
+f = 0.5;
 
 % the minimum acceptable detection rate per layer.
 d = 0.6;
@@ -114,23 +114,25 @@ ftarget = 0.01;
 % stores all classifers from each layer
 boosted_classes = cell(1, 0);
 
-while(F(i) > ftarget)
+while(F(i) >= ftarget)
     
     i = i + 1; 
-    
+    D = [D, 0];
     n = [n, 1];
     
     % appending previous fpr to the array of F
     F = [F, (F(i - 1))];
     
     % if the current layer's fpr is more than (previous layer's fpr * f)
-    while(F(i) > f * F(i - 1))
+    while(F(i) >= f * F(i - 1))
+        curr_f_target = f * F(i - 1);
+        curr_f_target
         % use P and N to train a classifier with n(i) features using AdaBoost
         
         disp("training false_positive_rate = " + F(i)) 
         
         n(i) = n(i) + 1;
-        D = [D, 0];
+        
 		
         % Create weak classifers
 		weak_classifiers = create_weak_classifers(weak_classifiers,dimensions, number);
@@ -149,24 +151,31 @@ while(F(i) > ftarget)
         eval_round = 1;
         detection_rate = 0;
         
+        [detection_rate, false_positive_rate, faces, nonfaces] = eval_boosted_classifer(boosted_classifier, weak_classifiers, faces, nonfaces, face_pool, nonface_pool, ...
+										number_faces,number_nonfaces, dimensions, boosted_classifier_num);
+        D(i) = detection_rate;
+        F(i) = false_positive_rate;                            
+                                    
         % the current cascaded classifier has a detection rate of at least d × D(i-1)
-        while(D(i) < (d * D(i - 1)))
-           
+        while(D(i) <= (d * D(i - 1)))
+           curr_d_target = (d * D(i - 1));
+           curr_d_target
            eval_round = eval_round + 1; 
             
            
            % Evaluate current cascaded classifier on validation set to determine F(i) and D(i)
-           [detection_rate, false_positive_rate] = eval_boosted_classifer(boosted_classifier, weak_classifiers, faces, nonfaces, face_pool, nonface_pool, ...
+           [detection_rate, false_positive_rate, faces, nonfaces] = eval_boosted_classifer(boosted_classifier, weak_classifiers, faces, nonfaces, face_pool, nonface_pool, ...
 										number_faces,number_nonfaces, dimensions, boosted_classifier_num);
-                                    
+           D(i)
            D(i) = detection_rate;
+           D(i)
            F(i) = false_positive_rate;
            disp("evaluating dectection_rate = " + detection_rate)
            % decrease threshold for the ith classifier (i.e. how many weak classifiers need to accept for strong classifier to accept)
            % until the current cascaded classifier has a detection rate of at least d × D(i-1) (this also affects F(i))
            
-           if(D(i) < (d * D(i - 1)))
-               boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) + 10;
+           if(D(i) <= (d * D(i - 1)))
+               boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) - 100;
                classifer_index = classifer_index + 1;
                if(classifer_index == size(boosted_classifier, 1) + 1)
                    classifer_index = 1;
@@ -205,7 +214,7 @@ while(F(i) > ftarget)
 save boosted_classifier boosted_classifier
 save weak_classifiers weak_classifiers
 save boosted_classifier_num boosted_classifier_num
-save classifer_casades boosted_classes
+save boosted_classes boosted_classes
 
 %%
 % Each time we create a weak classifer, we use generate_classifer

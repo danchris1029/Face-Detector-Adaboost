@@ -19,6 +19,9 @@ for scale = scales;
     scale
     tic;
     scaled_image = imresize(image, 1/scale, 'bilinear');
+    
+    
+    
     temp_result = apply_classifier_aux(scaled_image, classifiers, ...
                                        weak_classifiers, face_size);
     temp_result = imresize(temp_result, size(image), 'bilinear');

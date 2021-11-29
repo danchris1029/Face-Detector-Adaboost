@@ -39,18 +39,15 @@ face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
     skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
     skin_prob_image = skin_prob_image > .6;
     
-    predicted_faces = zeros(3, 0);
-    
-    for scale = 2
+    for scale = 1: 2
         
-    scaled_image = imresize(skin_prob_image, scale, 'bilinear');
+    scaled_image = imresize(skin_prob_image, 1/scale, 'bilinear');
     
-    %scaled_width = ceil(63 * (1/scale));
-    %scaled_height = ceil(57 * (1/scale));
 	for i = 1: size(scaled_image,1) - 63
         for j = 1: size(scaled_image,2) - 57	
             
             subwindow = scaled_image(i:(i+63-1), j:(j+57-1));
+            
             
             for classifer_index = 1: size(boosted_classes, 2)
                 
@@ -62,20 +59,13 @@ face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
                 end
             end
             
-            if (classifer_index == size(boosted_classes, 2) + 1)
-                response = prediction;
-                y = i / scale;
-                x = j / scale;
+            if (classifer_index == size(boosted_classes, 2))
                 
-                predicted_faces = cat(1, predicted_faces, [response, y, x]);
             end
         end 
     end
-    
-    end
    
-   figure();
-   imshow(subwindow, []);    
+        
     
     
     [result, boxes] = boosted_detector_demo(skin_prob_image, 1:1:1, boosted_classifier, weak_classifiers, [63,57], 5);    
