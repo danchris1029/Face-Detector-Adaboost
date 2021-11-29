@@ -12,6 +12,8 @@ face_horizontal = face_size(2);
 vertical_size = size(image, 1);
 horizontal_size = size(image, 2);
 result = zeros(vertical_size, horizontal_size);
+
+result(:, :) = -inf;
 classifier_number = size(boosted, 1);
 
 for weak_classifier = 1:classifier_number
@@ -22,6 +24,7 @@ for weak_classifier = 1:classifier_number
     
     for vertical = 1:(vertical_size-face_vertical+1)
         for horizontal = 1:(horizontal_size-face_horizontal+1)
+            
             response1 = eval_weak_classifier(classifier, integral, vertical, horizontal);
             if (response1 > classifier_threshold)
                 response2 = 1;
@@ -31,7 +34,14 @@ for weak_classifier = 1:classifier_number
             response = classifier_alpha * response2;
             row = vertical + round(face_vertical/2);
             col = horizontal + round(face_horizontal/2);
+            
+            if(image(row, col) ~= 0)
+                result(row, col) = 0;
+            end
             result(row, col) = result(row, col) + response;
+            
+            
         end
     end
+
 end

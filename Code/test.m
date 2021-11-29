@@ -19,6 +19,8 @@ load weak_classifiers
 load boosted_classifier_num
 %%
 
+number_faces = 5;
+
 %read in the cropped faces (size 100 x 100)
 face_images_cropped = dir(fullfile(test_cropped_faces,'*.bmp'));
 cropped_faces = zeros(100, 100, number_faces);
@@ -30,45 +32,46 @@ end
 %Get an image and detect skin on it, return the matrix that's been
 %thresholded
 
-positive_histogram = 
-negative_histogram = 
-
-for i = 1:size(face_images_photo, 1)
-    filename = fullfile(test_faces_photos,face_images_photo(2).name);
-    color_photo_image = read_gray(filename);
-    
-
-end
+negative_histogram = read_double_image('negatives.bin');
+positive_histogram = read_double_image('positives.bin');
 
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
-%cd([repo_path])
+
+
 for i = 1:size(face_images_photo, 1)
-
-    filename = fullfile(test_faces_photos,face_images_photo(2).name);
-    photo_image = read_gray(filename);
-    %imshow(photo_image, []);
-
-    [result, boxes] = boosted_detector_demo(photo_image, .4:0.2:3, boosted_classifier, weak_classifiers, [68,57], 5);
     
-    figure
+    %% Get skin pixels in logical values
+    filename = fullfile(test_faces_photos,face_images_photo(i).name);
+    color_photo_image = double(imread(filename));
+    skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
+    skin_prob_image = skin_prob_image > .90;
+    
+    inte = integral_image(skin_prob_image);
+    %{
+    skin_prob_image = imdilate(skin_prob_image, ones(2,2));
+    [labels, number] = bwlabel(skin_prob_image, 4);
+    counters = zeros(1,number);
+    for n = 1:number
+        % first, find all pixels having that label.
+        component_image = (labels == n);
+        % second, sum up all white pixels in component_image
+        counters(n) = sum(component_image(:));
+    end
+    [area, id] = maxk(counters,1);  
+    skin_logics = zeros(size(skin_prob_image,1),size(skin_prob_image,2));
+    for n = 1:size(id,2)
+        %skin_logics = skin_logics | (skin_prob_image & (labels(n) == id(n))); %this gets the hand
+        skin_logics = skin_logics | labels == id(n);
+    end
+    figure();
+    imshow(skin_logics,[]);
+    %%
+    %}
+    %[result, boxes] = boosted_detector_demo(skin_prob_image, 1:1:1, boosted_classifier, weak_classifiers, [68,57], 2);
+    
+    [result, boxes] = boosted_detector_demo(skin_prob_image, 1:1:1, boosted_classifier, weak_classifiers, [68,57], 2);    
+    
+    figure();
     imshow(result, []);
 end
-%%
-%{
-num_wrong_face = 0;
-num_wrong_nonface = 0;
-for i = 1:size(cropped_faces,3)
-    prediction = boosted_predict(cropped_faces(:, :, i), boosted_classifier, weak_classifiers, boosted_classifier_num);
-    if (prediction < 0)
-       num_wrong_face = num_wrong_face + 1; 
-    end
-    
-end
 
-for i = 1:size(nonfaces,3)
-    prediction = boosted_predict(nonfaces(:, :, i), boosted_classifier, weak_classifiers, boosted_classifier_num);
-    if (prediction > 0)
-     num_wrong_nonface = num_wrong_nonface + 1;
-    end
-end
-%}

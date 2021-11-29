@@ -1,4 +1,4 @@
-function boosted_classifier = bootstrapping_adaboost(dimensions,faces,nonfaces,face_pool,nonface_pool,number_faces,number_nonfaces)
+function [boosted_classifier, weak_classifiers] = bootstrapping_adaboost(dimensions,faces,nonfaces,face_pool,nonface_pool,number_faces,number_nonfaces)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 number = 1000;
@@ -73,7 +73,7 @@ while (delta_wrong_face > 20 && delta_wrong_nonface > 20)
         end
         %disp(i)
     end
-
+    
     % sum the responses from each image for each classifier together into one
     % row within responses
     boosted_classifier_num = boosted_classifier_num + 5;
