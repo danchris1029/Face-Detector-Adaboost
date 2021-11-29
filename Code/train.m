@@ -109,7 +109,7 @@ f = 0.2;
 d = 0.6;
 
 % target overall false positive rate.
-ftarget = 0.5;
+ftarget = 0.01;
 
 % stores all classifers from each layer
 boosted_classes = cell(1, 0);
@@ -150,18 +150,18 @@ while(F(i) > ftarget)
         detection_rate = 0;
         
         % the current cascaded classifier has a detection rate of at least d × D(i-1)
-        while(D(i) < (d * D(i - 1)) && eval_round ~= 5)
+        while(D(i) < (d * D(i - 1)))
            
            eval_round = eval_round + 1; 
             
-           disp("evaluating dectection_rate = " + detection_rate)
+           
            % Evaluate current cascaded classifier on validation set to determine F(i) and D(i)
            [detection_rate, false_positive_rate] = eval_boosted_classifer(boosted_classifier, weak_classifiers, faces, nonfaces, face_pool, nonface_pool, ...
 										number_faces,number_nonfaces, dimensions, boosted_classifier_num);
                                     
            D(i) = detection_rate;
            F(i) = false_positive_rate;
-           
+           disp("evaluating dectection_rate = " + detection_rate)
            % decrease threshold for the ith classifier (i.e. how many weak classifiers need to accept for strong classifier to accept)
            % until the current cascaded classifier has a detection rate of at least d × D(i-1) (this also affects F(i))
            
@@ -171,6 +171,7 @@ while(F(i) > ftarget)
                if(classifer_index == size(boosted_classifier, 1) + 1)
                    classifer_index = 1;
                end
+               disp("threshold = " + boosted_classifier(classifer_index, 3));
            end
            
         end
@@ -180,9 +181,11 @@ while(F(i) > ftarget)
     end
 
     disp("created layer")
+    %{
     for classifer_index = 1: size(boosted_classifier, 1)
         
     end
+    %}
     boosted_classes = cat(2, boosted_classes, {boosted_classifier});
     N = [];
     if(F(i) > ftarget)

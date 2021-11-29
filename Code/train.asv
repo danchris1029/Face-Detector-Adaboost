@@ -106,22 +106,24 @@ i = 1;
 f = 0.2;
 
 % the minimum acceptable detection rate per layer.
-d = 0.6;
+d = 0.2;
 
 % target overall false positive rate.
-ftarget = 0.5;
+ftarget = 0.01;
 
 % stores all classifers from each layer
 boosted_classes = cell(1, 0);
 
 while(F(i) > ftarget)
-    temp_decrease = 0.1;
     
     i = i + 1; 
     
     n = [n, 1];
+    
+    % appending previous fpr to the array of F
     F = [F, (F(i - 1))];
     
+    % if the current layer's fpr is more than (previous layer's fpr * f)
     while(F(i) > f * F(i - 1))
         % use P and N to train a classifier with n(i) features using AdaBoost
         
@@ -140,14 +142,15 @@ while(F(i) > ftarget)
 		boosted_classifier_num = n(i);
 		boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
 		
-        D(i) = 0;
+        % D(i) = 0;
         
         classifer_index = 1;
         
         eval_round = 1;
         detection_rate = 0;
         
-        while(D(i) < (d * D(i - 1)) && eval_round ~= 5)
+        % the current cascaded classifier has a detection rate of at least d × D(i-1)
+        while(D(i) < (d * D(i - 1)))
            
            eval_round = eval_round + 1; 
             
@@ -165,10 +168,12 @@ while(F(i) > ftarget)
            if(D(i) < (d * D(i - 1)))
                boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) + 10;
                classifer_index = classifer_index + 1;
-               if(classifer_index == size(classifer_index, 1)+1)
+               if(classifer_index == size(boosted_classifier, 1) + 1)
                    classifer_index = 1;
                end
+               disp("threshold = " + boosted_classifier(classifer_index, 3));
            end
+           
         end
         
         %F(i) = F(i) - temp_decrease;
