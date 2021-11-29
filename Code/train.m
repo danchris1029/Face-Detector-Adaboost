@@ -89,24 +89,41 @@ num_wrong_nonface = 0;
 delta_wrong_face = inf;
 delta_wrong_nonface = inf;
 boosted_classifier_num = 0;
+
+% false_postive_rates
 F = [1.0];
+
+% detection_rates
 D = [1.0];
+
+% number of classifers per layer
 n = [0];
+
+% the current layer that we're on
 i = 1;
+
+% the maximum acceptable false positive rate per layer.
 f = 0.2;
+
+% the minimum acceptable detection rate per layer.
 d = 0.6;
+
+% target overall false positive rate.
 ftarget = 0.5;
 
+% stores all classifers from each layer
 boosted_classes = cell(1, 0);
 
 while(F(i) > ftarget)
-    temp_decrease = 0.1;
     
     i = i + 1; 
     
-    n = [n, 5];
+    n = [n, 1];
+    
+    % appending previous fpr to the array of F
     F = [F, (F(i - 1))];
     
+    % if the current layer's fpr is more than (previous layer's fpr * f)
     while(F(i) > f * F(i - 1))
         % use P and N to train a classifier with n(i) features using AdaBoost
         
@@ -125,13 +142,14 @@ while(F(i) > ftarget)
 		boosted_classifier_num = n(i);
 		boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
 		
-        D(i) = 0;
+        % D(i) = 0;
         
         classifer_index = 1;
         
         eval_round = 1;
         detection_rate = 0;
         
+        % the current cascaded classifier has a detection rate of at least d × D(i-1)
         while(D(i) < (d * D(i - 1)) && eval_round ~= 5)
            
            eval_round = eval_round + 1; 
@@ -150,10 +168,11 @@ while(F(i) > ftarget)
            if(D(i) < (d * D(i - 1)))
                boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) + 10;
                classifer_index = classifer_index + 1;
-               if(classifer_index == size(classifer_index, 1)+1)
+               if(classifer_index == size(boosted_classifier, 1) + 1)
                    classifer_index = 1;
                end
            end
+           
         end
         
         %F(i) = F(i) - temp_decrease;
