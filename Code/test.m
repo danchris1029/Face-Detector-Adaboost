@@ -43,10 +43,11 @@ max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
 
 tic;
 
-% Rescale image with 1, 1.5, and 2 scales.
+% Rescale a sample image with 1, 1.5, and 2 scales.
 for scale = 1:.5:2
 scaled_image = imresize(test_skin_gray, scale, 'bilinear');
- 
+scale
+
 for i = 1: size(scaled_image,1) - 63
      for j = 1: size(scaled_image,2) - 57	  
          subwindow = scaled_image(i:(i+63-1), j:(j+57-1));
@@ -71,8 +72,10 @@ for i = 1: size(scaled_image,1) - 63
          end
      end 
 end
+
 end
 toc;
+
 result_number = 2;
 boxes = detection_boxes(skin_prob_image, zeros(face_size), max_responses, ...
                      ones(size(test_gray, 1), size(test_gray, 2)), result_number);
@@ -86,20 +89,8 @@ end
 figure();
 imshow(result, []);    
 
-toc;
-
 %%
 tic;
-for image_index = 1:size(face_images_photo)
-
-filename = fullfile(test_faces_photos,face_images_photo(image_index).name);
-color_photo_image = double(imread(filename));
-skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
-skin_prob_image = skin_prob_image > .7;
-
-test_gray = read_gray(filename);
-test_skin_gray = (test_gray .*(skin_prob_image));
-max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
 
 %%
 % Get number of false positives and false negatives with a threshold from all test images.
@@ -141,10 +132,23 @@ for i = 1:size(nonfaces_test,1)
 end
 false_detection_rate_nonfaces = false_negative_nonfaces/size(nonfaces_test,1);
 toc;
+
 %%
-toc;
-% Rescale image with 1, 1.5, and 2 scales.
-for scale = 1:.5:2
+tic;
+% Run all images 
+
+for image_index = 1:size(face_images_photo)
+
+filename = fullfile(test_faces_photos,face_images_photo(image_index).name);
+color_photo_image = double(imread(filename));
+skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
+skin_prob_image = skin_prob_image > .7;
+
+test_gray = read_gray(filename);
+test_skin_gray = (test_gray .*(skin_prob_image));
+max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
+
+for scale = 1:1:2
 scaled_image = imresize(test_skin_gray, scale, 'bilinear');
  
 for i = 1: size(scaled_image,1) - 63
@@ -171,6 +175,7 @@ for i = 1: size(scaled_image,1) - 63
          end
      end 
 end
+scale
 end
 
 end
