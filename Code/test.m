@@ -1,3 +1,5 @@
+% test.m
+
 %%
 cd(code_directory)
 
@@ -27,87 +29,80 @@ negative_histogram = read_double_image('negatives.bin');
 positive_histogram = read_double_image('positives.bin');
 
 face_images_photo = dir(fullfile(test_faces_photos,'*.jpg'));
+face_size = [63, 57];
 
-%for i = 1:size(face_images_photo, 1)
 %% Get skin pixels in logical values
-    face_size = [63, 57];
-    
-    image_index = 1;
-    
-    filename = fullfile(test_faces_photos,face_images_photo(image_index).name);
-    color_photo_image = double(imread(filename));
-    skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
-    skin_prob_image = skin_prob_image > .7;
-   
-    %predicted_faces = zeros(0, 3);
-    
-    test_gray = read_gray(filename);
-    test_skin_gray = (test_gray .*(skin_prob_image));
-    max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
+image_index = 1;
+filename = fullfile(test_faces_photos,face_images_photo(image_index).name);
+color_photo_image = double(imread(filename));
+skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
+skin_prob_image = skin_prob_image > .7;
 
-    for scale = 1:.5:2
-    
-    scaled_image = imresize(test_skin_gray, scale, 'bilinear');
-    
-    %scaled_width = ceil(63 * (1/scale));
-    %scaled_height = ceil(57 * (1/scale));
-	for i = 1: size(scaled_image,1) - 63
-        for j = 1: size(scaled_image,2) - 57	
-            %i = 117;
-            %j = 152;
-            %i
-            subwindow = scaled_image(i:(i+63-1), j:(j+57-1));
-            
-            for classifier_index = 1: size(boosted_classes, 2)
-                
-                boosted_model = boosted_classes{classifier_index};
-                prediction = boosted_predict(subwindow, boosted_model, weak_classifiers, size(boosted_model, 1));
-                %prediction
-                
-                if(prediction < 0)
-                    classifier_index = 1;
-                    break;
-                end
-            end
-            %classifer_index
-            if (classifier_index == size(boosted_classes, 2))
-                %disp("here");
-                response = prediction;
-                y = round(i / scale);
-                x = round(j / scale);
-                
-                max_responses(y, x) = max_responses(y, x) + response;
-                
-                %predicted_faces = cat(1, predicted_faces, [response, y, x]);
-            end
-        end 
-    end
-    scale
-    end
-   
-    result_number = 3;
-    boxes = detection_boxes(skin_prob_image, zeros(face_size), max_responses, ...
-                         ones(size(test_gray, 1), size(test_gray, 2)), result_number);
-    
-                     
-    result = test_gray;                 
-    for number = 1: result_number
-        result = draw_rectangle1(result, boxes(number, 1), boxes(number, 2), ...
-                             boxes(number, 3), boxes(number, 4));
-    end
-   figure();
-   imshow(result, []);    
-    
-    %{
-    [result, boxes] = boosted_detector_demo(skin_prob_image, 1:1:1, boosted_classifier, weak_classifiers, [63,57], 5);    
-    
-    figure();
-    imshow(result, []);
-%end
-   
-  %}
+test_gray = read_gray(filename);
+test_skin_gray = (test_gray .*(skin_prob_image));
+max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
+
+tic;
+
+% Rescale image with 1, 1.5, and 2 scales.
+for scale = 1:.5:2
+scaled_image = imresize(test_skin_gray, scale, 'bilinear');
+ 
+for i = 1: size(scaled_image,1) - 63
+     for j = 1: size(scaled_image,2) - 57	  
+         subwindow = scaled_image(i:(i+63-1), j:(j+57-1));
+         
+         for classifier_index = 1: size(boosted_classes, 2)
+             
+             boosted_model = boosted_classes{classifier_index};
+             prediction = boosted_predict(subwindow, boosted_model, weak_classifiers, size(boosted_model, 1));
+             
+             if(prediction < 0)
+                 classifier_index = 1;
+                 break;
+             end
+         end
+
+         if (classifier_index == size(boosted_classes, 2))
+             response = prediction;
+             y = round(i / scale);
+             x = round(j / scale);
+             
+             max_responses(y, x) = max_responses(y, x) + response;
+         end
+     end 
+end
+end
+toc;
+result_number = 2;
+boxes = detection_boxes(skin_prob_image, zeros(face_size), max_responses, ...
+                     ones(size(test_gray, 1), size(test_gray, 2)), result_number);
+
+                 
+result = test_gray;                 
+for number = 1: result_number
+    result = draw_rectangle1(result, boxes(number, 1), boxes(number, 2), ...
+                         boxes(number, 3), boxes(number, 4));
+end
+figure();
+imshow(result, []);    
 
 
+%%
+tic;
+for image_index = 1:size(face_images_photo)
+
+filename = fullfile(test_faces_photos,face_images_photo(image_index).name);
+color_photo_image = double(imread(filename));
+skin_prob_image = detect_skin(color_photo_image, positive_histogram,  negative_histogram);
+skin_prob_image = skin_prob_image > .7;
+
+test_gray = read_gray(filename);
+test_skin_gray = (test_gray .*(skin_prob_image));
+max_responses = zeros(size(test_gray, 1), size(test_gray, 2));
+
+%%
+% Get number of false positives and false negatives with a threshold from all test images.
 
 %read in the cropped faces (size 100 x 100)
 face_images_cropped = dir(fullfile(test_cropped_faces,'*.bmp'));
@@ -146,3 +141,37 @@ for i = 1:size(nonfaces_test,1)
 end
 false_detection_rate_nonfaces = false_negative_nonfaces/size(nonfaces_test,1);
 
+%%
+
+% Rescale image with 1, 1.5, and 2 scales.
+for scale = 1:.5:2
+scaled_image = imresize(test_skin_gray, scale, 'bilinear');
+ 
+for i = 1: size(scaled_image,1) - 63
+     for j = 1: size(scaled_image,2) - 57	  
+         subwindow = scaled_image(i:(i+63-1), j:(j+57-1));
+         
+         for classifier_index = 1: size(boosted_classes, 2)
+             
+             boosted_model = boosted_classes{classifier_index};
+             prediction = boosted_predict(subwindow, boosted_model, weak_classifiers, size(boosted_model, 1));
+             
+             if(prediction < 0)
+                 classifier_index = 1;
+                 break;
+             end
+         end
+
+         if (classifier_index == size(boosted_classes, 2))
+             response = prediction;
+             y = round(i / scale);
+             x = round(j / scale);
+             
+             max_responses(y, x) = max_responses(y, x) + response;
+         end
+     end 
+end
+end
+
+end
+toc;

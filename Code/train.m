@@ -1,8 +1,6 @@
-% We're just using training images
+% train.m
 
-% we don't find the best rectangle filter, but the best classifer when
-% boosting
-
+%%
 s = filesep; % This gets the file separator character from the  system
 training_faces = strcat(training_directory, '\training_faces');
 training_nonfaces = strcat(training_directory, '\training_nonfaces');
@@ -16,18 +14,18 @@ addpath(training_nonfaces)
 
 cd(code_directory)
 
-
 best_boosted_classifer = zeros(0, 3);
 
 %%
 
+% we use a 1:2 ratio for faces and nonface subwindows.
+% and every nonface image has 5 subwindows.
 number_faces = 50;
 number_nonfaces = 20;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
 
-%nfiles = length(imagefiles);
 faces = zeros(63, 57, number_faces);
 for i = 1:number_faces
   filename = fullfile(training_faces,face_images(i).name);
@@ -41,8 +39,6 @@ for i = 1:size(face_images, 1)
   tempface = read_gray(filename);
   face_pool(:,:,i) = tempface(26:88, 22:78);
 end
-%figure(1)
-%imshow(faces(:,:,27),[]);
 
 nonfaces = zeros(size(faces,1), size(faces,2), number_nonfaces);
 num_subwindows = 5;
@@ -74,20 +70,15 @@ end
 dimensions = [size(faces(:,:,1),1), size(faces(:,:,1),2)];%[100, 100];
 
 
+tic;
 %%
+% training classifer cascades
 
 number = 1000;
 weak_classifiers = cell(1, 0);
 
-rounds = 20;
-%for round = 1: rounds
-
-old_num_wrong_nonface = -1;
-old_num_wrong_face = -1;
 num_wrong_face = 0;
 num_wrong_nonface = 0;
-delta_wrong_face = inf;
-delta_wrong_nonface = inf;
 boosted_classifier_num = 0;
 
 % false_postive_rates
@@ -103,19 +94,22 @@ n = [0];
 i = 1;
 
 % the maximum acceptable false positive rate per layer.
-f = 0.2;
+f = 0.5;
 
 % the minimum acceptable detection rate per layer.
-d = 0.6;
+d = 0.5;
 
 % target overall false positive rate.
 ftarget = 0.01;
+
+% threshold decreaser
+threshold_decrease = -1000;
 
 % stores all classifers from each layer
 boosted_classes = cell(1, 0);
 
 while(F(i) >= ftarget)
-    
+    threshold_decrease = -1000;
     i = i + 1; 
     D = [D, 0];
     n = [n, 1];
@@ -127,27 +121,23 @@ while(F(i) >= ftarget)
     while(F(i) >= f * F(i - 1))
         curr_f_target = f * F(i - 1);
         curr_f_target
-        % use P and N to train a classifier with n(i) features using AdaBoost
         
+        % use P and N to train a classifier with n(i) features using AdaBoost
         disp("training false_positive_rate = " + F(i)) 
         
         n(i) = n(i) + 1;
-        
-		
+        disp("number of current features is = " + n(i)) 
         % Create weak classifers
 		weak_classifiers = create_weak_classifers(weak_classifiers,dimensions, number);
 		
-		% create_responses
+		% Create responses
 		[responses, labels] = create_responses(weak_classifiers, faces, nonfaces, face_pool, ...
 										nonface_pool,number_faces,number_nonfaces, dimensions);
 		
 		boosted_classifier_num = n(i);
 		boosted_classifier = AdaBoost(responses, labels, boosted_classifier_num);
-		
-        % D(i) = 0;
-        
+		 
         classifer_index = 1;
-        
         eval_round = 1;
         detection_rate = 0;
         
@@ -160,42 +150,38 @@ while(F(i) >= ftarget)
         while(D(i) <= (d * D(i - 1)))
            curr_d_target = (d * D(i - 1));
            curr_d_target
-           eval_round = eval_round + 1; 
-            
+           eval_round = eval_round + 1;  
            
            % Evaluate current cascaded classifier on validation set to determine F(i) and D(i)
            [detection_rate, false_positive_rate, faces, nonfaces] = eval_boosted_classifer(boosted_classifier, weak_classifiers, faces, nonfaces, face_pool, nonface_pool, ...
 										number_faces,number_nonfaces, dimensions, boosted_classifier_num);
-           D(i)
            D(i) = detection_rate;
-           D(i)
            F(i) = false_positive_rate;
            disp("evaluating dectection_rate = " + detection_rate)
+           
            % decrease threshold for the ith classifier (i.e. how many weak classifiers need to accept for strong classifier to accept)
            % until the current cascaded classifier has a detection rate of at least d × D(i-1) (this also affects F(i))
-           
            if(D(i) <= (d * D(i - 1)))
-               boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) - 100;
+               boosted_classifier(classifer_index, 3) = boosted_classifier(classifer_index, 3) + threshold_decrease;
                classifer_index = classifer_index + 1;
                if(classifer_index == size(boosted_classifier, 1) + 1)
                    classifer_index = 1;
                end
                disp("threshold = " + boosted_classifier(classifer_index, 3));
+               if(D(i) < 0.01)
+                   threshold_decrease = 1000;
+               end
+                   
            end
            
         end
         
-        %F(i) = F(i) - temp_decrease;
-        
     end
 
     disp("created layer")
-    %{
-    for classifer_index = 1: size(boosted_classifier, 1)
-        
-    end
-    %}
     boosted_classes = cat(2, boosted_classes, {boosted_classifier});
+    
+    %{
     N = [];
     if(F(i) > ftarget)
         %evaluate the current cascaded detector on the set of non-face 
@@ -204,12 +190,10 @@ while(F(i) >= ftarget)
         % This is probably bootstrapping
         
     end
- end
+    %}
+end
 
-        
-
-%boosted_classifier = bootstrapping_adaboost(dimensions,faces,nonfaces,face_pool,nonface_pool,number_faces,number_nonfaces);
-%}
+toc; 
 
 save boosted_classifier boosted_classifier
 save weak_classifiers weak_classifiers
@@ -217,13 +201,3 @@ save boosted_classifier_num boosted_classifier_num
 save boosted_classes boosted_classes
 
 %%
-% Each time we create a weak classifer, we use generate_classifer
-
-% Every weak classifer has soft classifer per threshold
-
-% Top 1000 responses will become the  classifer
-
-% get integral skin image
-
-
-% generate classifer
