@@ -87,6 +87,7 @@ end
 figure();
 imshow(result, []);    
 
+toc;
 
 %%
 tic;
@@ -140,9 +141,9 @@ for i = 1:size(nonfaces_test,1)
     end
 end
 false_detection_rate_nonfaces = false_negative_nonfaces/size(nonfaces_test,1);
-
+toc;
 %%
-
+toc;
 % Rescale image with 1, 1.5, and 2 scales.
 for scale = 1:.5:2
 scaled_image = imresize(test_skin_gray, scale, 'bilinear');
