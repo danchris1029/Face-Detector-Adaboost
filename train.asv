@@ -1,6 +1,6 @@
 % train.m
 
-%%
+%% Add important info from
 s = filesep; % This gets the file separator character from the  system
 training_faces = strcat(training_directory, '\training_faces');
 training_nonfaces = strcat(training_directory, '\training_nonfaces');

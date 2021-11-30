@@ -1,6 +1,6 @@
 % train.m
 
-%%
+%% Add important info from paths for functions
 s = filesep; % This gets the file separator character from the  system
 training_faces = strcat(training_directory, '\training_faces');
 training_nonfaces = strcat(training_directory, '\training_nonfaces');
@@ -8,15 +8,14 @@ other_code = strcat(code_directory, '\given');
 addpath([other_code s '00_common' s '00_detection'])
 addpath([other_code s '00_common' s '00_images'])
 addpath([other_code s '00_common' s '00_utilities'])
+addpath(code_directory)
 addpath(other_code)
 addpath(training_faces)
 addpath(training_nonfaces)
 
-cd(code_directory)
-
 best_boosted_classifer = zeros(0, 3);
 
-%%
+%% Read in all faces and non faces
 
 % we use a 1:2 ratio for faces and nonface subwindows.
 % and every nonface image has 5 subwindows.
@@ -71,8 +70,7 @@ dimensions = [size(faces(:,:,1),1), size(faces(:,:,1),2)];%[100, 100];
 
 
 tic;
-%%
-% training classifer cascades
+%% training classifer cascades
 
 number = 1000;
 weak_classifiers = cell(1, 0);
@@ -180,19 +178,8 @@ while(F(i) >= ftarget)
 
     disp("created layer")
     boosted_classes = cat(2, boosted_classes, {boosted_classifier});
-    
-    %{
-    N = [];
-    if(F(i) > ftarget)
-        %evaluate the current cascaded detector on the set of non-face 
-        %images and put any false detections into the set N.
-        
-        % This is probably bootstrapping
-        
-    end
-    %}
 end
-
+%% Save data for training
 toc; 
 
 save boosted_classifier boosted_classifier
