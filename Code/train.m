@@ -21,8 +21,8 @@ best_boosted_classifer = zeros(0, 3);
 
 %%
 
-number_faces = 10;
-number_nonfaces = 2;
+number_faces = 50;
+number_nonfaces = 20;
 
 face_images = dir(fullfile(training_faces,'*.bmp'));
 nonface_images = dir(fullfile(training_nonfaces,'*.jpg'));
@@ -103,7 +103,7 @@ n = [0];
 i = 1;
 
 % the maximum acceptable false positive rate per layer.
-f = 0.5;
+f = 0.2;
 
 % the minimum acceptable detection rate per layer.
 d = 0.6;
