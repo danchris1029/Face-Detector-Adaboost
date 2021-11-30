@@ -1,6 +1,7 @@
 % test.m
 
 %%
+cd(code_directory)
 
 s = filesep; % This gets the file separator character from the  system
 test_faces_photos = strcat(training_directory, '\test_face_photos');

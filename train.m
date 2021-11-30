@@ -12,6 +12,8 @@ addpath(other_code)
 addpath(training_faces)
 addpath(training_nonfaces)
 
+cd(code_directory)
+
 best_boosted_classifer = zeros(0, 3);
 
 %%
