@@ -1,4 +1,4 @@
-data_directory = '..\Data';
-code_directory = '..\Code';
-training_directory = '..\Data';
+data_directory = 'fill in appropriately';
+code_directory = 'fill in appropriately';
+training_directory = 'fill in appropriately';
 
