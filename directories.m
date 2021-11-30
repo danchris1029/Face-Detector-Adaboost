@@ -1,6 +1,5 @@
 
-data_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Data';
-code_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Code';
-training_directory = 'C:\Users\Connor\Documents\MATLAB\ComputerVisionFinal\ComputerVisionProj\Data';
-
+data_directory = 'fill in appopriately';
+code_directory = 'fill in appopriately';
+training_directory = 'fill in appopriately';
 
