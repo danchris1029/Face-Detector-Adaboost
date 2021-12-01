@@ -1,4 +1,4 @@
-# Face Detection using Adaboost and Classifier Cascades
+# Face Detection Using Adaboost And Classifier Cascades
 
 
 ## Abstract
