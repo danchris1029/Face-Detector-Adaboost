@@ -1,10 +1,4 @@
-# ComputerVisionProj
-
-## How to run
-
-1. Run directories.m
-2. Run train.m or test.m in 
-ComputerVisionProj
+## ComputerVisionProj
 
 # Abstract
 
@@ -19,3 +13,9 @@ creating multiple layers of classifiers where each one is stronger than the prev
 These weak classifiers are also known as Haar filters and when given an offset, we can
 extract features and determine how good of a classifier it was by using the integral of
 the face.
+
+## How to run
+
+1. Run directories.m
+2. Run train.m or test.m in 
+ComputerVisionProj
