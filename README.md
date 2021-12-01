@@ -1,6 +1,7 @@
-## ComputerVisionProj
+# Face Detection using Adaboost and Classifier Cascades
 
-# Abstract
+
+## Abstract
 
 In this project we attempt to create an architecture that can detect faces utilizing
 AdaBoost, skin detection, bootstrapping, and classifier cascades. Adaboost tweaks a
