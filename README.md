@@ -4,7 +4,8 @@
 ## Abstract
 
 In this project we attempt to create an architecture that can detect faces utilizing
-AdaBoost, skin detection, bootstrapping, and classifier cascades. Adaboost tweaks a
+AdaBoost, skin detection, bootstrapping, and classifier cascades. 
+Adaboost tweaks a
 set of weak classifiers until they converge into a strong classifier. Skin detection is used
 on an image to remove non-skin pixels which increases the accuracy of our face
 detector. Bootstrapping helps facilitate training by identifying false positive subwindows
